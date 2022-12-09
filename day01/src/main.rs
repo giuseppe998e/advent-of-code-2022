@@ -1,7 +1,9 @@
 mod parts;
 use crate::parts::{part_one, part_two};
 
-fn parse_elves(input: &str, elves: &mut Vec<u32>) -> Result<(), &'static str> {
+fn parse_elves(input: &str) -> Result<Vec<u32>, &'static str> {
+    let mut elves: Vec<u32> = vec![0];
+
     for line in input.lines() {
         match line.is_empty() {
             true => elves.push(0),
@@ -12,14 +14,13 @@ fn parse_elves(input: &str, elves: &mut Vec<u32>) -> Result<(), &'static str> {
         }
     }
 
-    Ok(())
+    Ok(elves)
 }
 
 fn main() -> Result<(), &'static str> {
     // Parse elves calories
     let input = include_str!("input.txt");
-    let mut elves: Vec<u32> = vec![0];
-    parse_elves(input, &mut elves)?;
+    let mut elves = parse_elves(input)?;
     
     // Part one
     let (index, value) = part_one(&mut elves)?;
