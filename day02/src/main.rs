@@ -1,11 +1,9 @@
-mod prelude;
 mod shape;
+mod prelude;
 use prelude::*;
 
 mod parts;
-use parts::part_one;
-
-use crate::parts::part_two;
+use parts::{part_one, part_two};
 
 fn parse_rounds(input: &str) -> Result<Vec<Round>> {
     let shapes = input

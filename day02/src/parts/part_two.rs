@@ -1,7 +1,5 @@
 use crate::prelude::*;
 
-
-
 fn calc_round_score(round: &Round) -> u32 {
     let (rival, end) = (round[0], round[1]);
 
