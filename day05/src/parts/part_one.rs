@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 pub fn part_one(stacks: &mut [Stack], procedures: &[Procedure]) -> Result<String> {
-    for (quantity, from, to) in procedures.iter().copied() {
+    for &(quantity, from, to) in procedures {
         let entries = {
             let stack_from = stacks
                 .get_mut(from)

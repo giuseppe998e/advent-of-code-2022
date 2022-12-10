@@ -44,7 +44,7 @@ fn parse_stacks_line(characters: &mut Chars, stacks: &mut Stacks) -> Result<()> 
 fn parse_stacks(input: &mut Lines) -> Result<Stacks> {
     let mut stacks: Stacks = Vec::with_capacity(9);
 
-    while let Some(line) = input.next() {
+    for line in input {
         match line {
             _ if line.is_empty() => break,
             _ => {
@@ -60,7 +60,7 @@ fn parse_stacks(input: &mut Lines) -> Result<Stacks> {
 fn parse_procedures(input: &mut Lines) -> Result<Procedures> {
     let mut procedures: Vec<Procedure> = Vec::with_capacity(8);
 
-    while let Some(line) = input.next() {
+    for line in input {
         let mut words = line.split_whitespace();
 
         words.next();
@@ -99,14 +99,14 @@ fn parse_supplies(input: &str) -> Result<(Stacks, Procedures)> {
 fn main() -> Result<()> {
     // Parse stacks & procedures
     let input = include_str!("input.txt");
-    let (stacks, procedures) = parse_supplies(input)?;
+    let (mut stacks, procedures) = parse_supplies(input)?;
 
     // Part one
-    let result = part_one(stacks.clone().as_mut(), &procedures)?;
+    let result = part_one(&mut stacks.clone(), &procedures)?;
     println!("[Part one] Top of stacks: {}", result);
 
     // Part two
-    let result = part_two(stacks.clone().as_mut(), &procedures)?;
+    let result = part_two(&mut stacks, &procedures)?;
     println!("[Part two] Top of stacks: {}", result);
 
     Ok(())
