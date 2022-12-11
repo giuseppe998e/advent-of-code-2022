@@ -1,6 +1,4 @@
-pub fn part_two(elves: &mut Vec<u32>) -> u32 {
-    elves.sort_by(|a, b| b.cmp(a));
-    elves.truncate(3);
-
-    elves.iter().sum()
+pub fn part_two(elves: &mut [u32]) -> u32 {
+    elves.sort_unstable_by(|a, b| b.cmp(a));
+    elves[..3].iter().sum()
 }

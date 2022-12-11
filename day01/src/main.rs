@@ -1,35 +1,42 @@
-mod parts;
-use crate::parts::{part_one, part_two};
+mod prelude;
+use prelude::*;
 
-fn parse_elves(input: &str) -> Result<Vec<u32>, &'static str> {
-    let mut elves: Vec<u32> = vec![0];
+mod parts;
+use parts::{part_one, part_two};
+
+fn parse_elves(input: &str) -> Result<Vec<u32>> {
+    let mut elves = vec![0u32];
 
     for line in input.lines() {
-        match line.is_empty() {
-            true => elves.push(0),
-            false => {
-                let calories: u32 = line.parse().map_err(|_| "A non-number found in the input!")?;
-                elves.last_mut().map(|val| *val += calories);
-            }
+        if line.is_empty() {
+            elves.push(0);
+            continue;
+        }
+
+        let calories = line
+            .parse::<u32>()
+            .map_err(|_| "A non-number found in the input!")?;
+
+        if let Some(entry) = elves.last_mut() {
+            *entry += calories;
         }
     }
 
     Ok(elves)
 }
 
-fn main() -> Result<(), &'static str> {
+fn main() -> Result<()> {
     // Parse elves calories
     let input = include_str!("input.txt");
     let mut elves = parse_elves(input)?;
-    
+
     // Part one
-    let (index, value) = part_one(&mut elves)?;
-    println!("[Part one] Elve index: {:?}", index);
-    println!("[Part one] Elve value: {:?}", value);
+    let result = part_one(&elves)?;
+    println!("[Part one] Elf calories: {:?}", result);
 
     // Part two
     let result = part_two(&mut elves);
-    println!("[Part two] First 3 Elves total calories: {:?}", result);
+    println!("[Part two] First 3 Elves calories sum: {:?}", result);
 
     Ok(())
 }
