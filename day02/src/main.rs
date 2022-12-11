@@ -1,5 +1,5 @@
-mod shape;
 mod prelude;
+mod shape;
 use prelude::*;
 
 mod parts;

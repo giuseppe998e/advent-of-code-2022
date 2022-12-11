@@ -3,15 +3,15 @@ use std::cmp::Ordering;
 mod kind;
 pub use kind::ShapeKind;
 
-static ROCK: Shape = Shape {
+const ROCK: Shape = Shape {
     kind: ShapeKind::Rock,
     is_rival: false,
 };
-static PAPER: Shape = Shape {
+const PAPER: Shape = Shape {
     kind: ShapeKind::Paper,
     is_rival: false,
 };
-static SCRISSORS: Shape = Shape {
+const SCRISSORS: Shape = Shape {
     kind: ShapeKind::Scissors,
     is_rival: false,
 };

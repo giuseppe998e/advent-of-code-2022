@@ -3,11 +3,8 @@ use std::cmp::Ordering;
 use crate::prelude::*;
 
 fn calc_round_score(round: &Round) -> u32 {
-    let (me, rival) = if round[1].is_rival {
-        (round[0], round[1])
-    } else {
-        (round[1], round[0])
-    };
+    let rival_first = round[0].is_rival;
+    let (me, rival) = (round[rival_first as usize], round[!rival_first as usize]);
 
     let score = match me.cmp(&rival) {
         // Win
