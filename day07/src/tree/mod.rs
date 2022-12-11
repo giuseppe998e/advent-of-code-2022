@@ -19,26 +19,24 @@ fn parse_output_line(
         word.parse::<usize>().ok()
     };
 
-    let name = words
-        .next()
-        .map(str::to_string)
-        .ok_or("No name was provided for the node!")?;
+    let name = words.next().ok_or("No name was provided for the node!")?;
 
-    let mut parent_childs = current
+    let mut current_nodes = current
         .as_ref()
         .and_then(|rc| rc.children_mut())
-        .ok_or("Pointer to current directory missing!")?;
+        .ok_or("The pointer to current directory is missing!")?;
 
-    if let Err(position) = parent_childs.binary_search_by(|node| node.name().cmp(&name)) {
+    // If the "current" directory doesn't contains this Node name, add the new Node to the recommended "position"
+    if let Err(position) = current_nodes.binary_search_by(|node| node.name().cmp(name)) {
         let node_kind = match number {
-            // It's file
+            // Case when the new node is a file
             Some(size) => NodeKind::new_file(size),
-            // It's directory
+            // Case when the new node is a directory
             None => NodeKind::new_dir(),
         };
 
-        let node = Node::new(name, current.as_ref(), node_kind);
-        parent_childs.insert(position, Rc::new(node));
+        let node = Node::new(name.to_string(), current.as_ref(), node_kind);
+        current_nodes.insert(position, Rc::new(node));
     }
 
     Ok(())
@@ -50,7 +48,7 @@ fn parse_command_line(
 ) -> Result<()> {
     let directory = {
         if words.next().filter(|&str_| str_ == "cd").is_none() {
-            return Ok(());
+            return Ok(()); // All commands other than "cd" simply return
         }
 
         words
@@ -58,7 +56,9 @@ fn parse_command_line(
             .ok_or("The command has no directory name argument!")?
     };
 
+    // Update the "current" directory pointer
     *current = match directory {
+        // The "current" directory pointer needs to go up
         ".." => current
             .as_ref()
             .ok_or("Attempted to go back up from the root directory!")
@@ -68,10 +68,13 @@ fn parse_command_line(
                     .ok_or("The pointer to parent directory is missing!")
             })
             .map(Some)?,
+        // The "current" directory pointer is None == Root directory
+        // Should occur just once
         _ if current.is_none() => {
             let root = Node::new(directory.to_string(), None, NodeKind::new_dir());
             Some(Rc::new(root))
         }
+        // The "current" directory pointer is Some(_)
         _ => {
             let node_rc = {
                 let mut current_nodes = current
@@ -86,6 +89,7 @@ fn parse_command_line(
                     Err(position) => {
                         let node =
                             Node::new(directory.to_string(), current.as_ref(), NodeKind::new_dir());
+
                         let node_rc = Rc::new(node);
                         current_nodes.insert(position, Rc::clone(&node_rc));
                         node_rc
@@ -110,6 +114,7 @@ pub fn parse_tree(input: &str) -> Result<Rc<Node>> {
 
         while let Some(&word) = words.peek() {
             match word {
+                // Parse command lines
                 "$" => {
                     words.next();
                     parse_command_line(&mut current, &mut words)?;
@@ -121,6 +126,7 @@ pub fn parse_tree(input: &str) -> Result<Rc<Node>> {
                             .ok_or("The current position is None!");
                     }
                 }
+                // Command output lines
                 _ => parse_output_line(&mut current, &mut words)?,
             }
         }
