@@ -48,55 +48,54 @@ fn parse_command_line(
     current: &mut Option<Rc<Node>>,
     words: &mut Peekable<SplitWhitespace>,
 ) -> Result<()> {
-    if words.next().filter(|&str_| str_ == "cd").is_some() {
-        let directory = words.next().ok_or("Directory name missing!")?;
-
-        if current.is_none() {
-            if directory == ".." {
-                return Err("Attempted to go back up from the root directory!");
-            }
-
-            let root = Node::new(directory.to_string(), None, NodeKind::new_dir());
-            *current = Some(Rc::new(root));
+    let directory = {
+        if words.next().filter(|&str_| str_ == "cd").is_none() {
             return Ok(());
         }
 
-        match directory {
-            ".." => {
-                *current = current
-                    .as_ref()
-                    .map(|rc| rc.parent().upgrade())
-                    .ok_or("Pointer to current directory missing!")?
-            }
-            _ => {
-                let node_rc = {
-                    let mut parent_childs = current
-                        .as_ref()
-                        .and_then(|rc| rc.children_mut())
-                        .ok_or("Pointer to current directory missing!")?;
+        words
+            .next()
+            .ok_or("The command has no directory name argument!")?
+    };
 
-                    let node_exists =
-                        parent_childs.binary_search_by(|node| node.name().cmp(directory));
-
-                    match node_exists {
-                        Ok(index) => Rc::clone(&parent_childs[index]),
-                        Err(position) => {
-                            let node = Node::new(
-                                directory.to_string(),
-                                current.as_ref(),
-                                NodeKind::new_dir(),
-                            );
-                            let node_rc = Rc::new(node);
-                            parent_childs.insert(position, Rc::clone(&node_rc));
-                            node_rc
-                        }
-                    }
-                };
-
-                *current = Some(node_rc);
-            }
+    *current = match directory {
+        ".." => current
+            .as_ref()
+            .ok_or("Attempted to go back up from the root directory!")
+            .and_then(|rc| {
+                rc.parent()
+                    .upgrade()
+                    .ok_or("The pointer to parent directory is missing!")
+            })
+            .map(Some)?,
+        _ if current.is_none() => {
+            let root = Node::new(directory.to_string(), None, NodeKind::new_dir());
+            Some(Rc::new(root))
         }
-    }
+        _ => {
+            let node_rc = {
+                let mut current_nodes = current
+                    .as_ref()
+                    .and_then(|rc| rc.children_mut())
+                    .ok_or("The pointer to current directory is missing!")?;
+
+                let node_exists = current_nodes.binary_search_by(|node| node.name().cmp(directory));
+
+                match node_exists {
+                    Ok(index) => Rc::clone(&current_nodes[index]),
+                    Err(position) => {
+                        let node =
+                            Node::new(directory.to_string(), current.as_ref(), NodeKind::new_dir());
+                        let node_rc = Rc::new(node);
+                        current_nodes.insert(position, Rc::clone(&node_rc));
+                        node_rc
+                    }
+                }
+            };
+
+            Some(node_rc)
+        }
+    };
 
     Ok(())
 }
