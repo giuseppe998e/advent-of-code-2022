@@ -109,15 +109,18 @@ pub fn parse_tree(input: &str) -> Result<Rc<Node>> {
     let mut root: Result<Rc<Node>> = Err("The given input is malformed!");
     let mut current: Option<Rc<Node>> = None;
 
-    for line in input.lines() {
-        let mut words = line.split_whitespace().peekable();
+    let input_iter = input
+        .lines()
+        .map(str::split_whitespace)
+        .map(SplitWhitespace::peekable);
 
-        while let Some(&word) = words.peek() {
+    for mut line_words in input_iter {
+        while let Some(&word) = line_words.peek() {
             match word {
                 // Parse command lines
                 "$" => {
-                    words.next();
-                    parse_command_line(&mut current, &mut words)?;
+                    line_words.next();
+                    parse_command_line(&mut current, &mut line_words)?;
 
                     if root.is_err() {
                         root = current
@@ -127,7 +130,7 @@ pub fn parse_tree(input: &str) -> Result<Rc<Node>> {
                     }
                 }
                 // Command output lines
-                _ => parse_output_line(&mut current, &mut words)?,
+                _ => parse_output_line(&mut current, &mut line_words)?,
             }
         }
     }
