@@ -76,28 +76,24 @@ fn parse_command_line(
         }
         // The "current" directory pointer is Some(_)
         _ => {
-            let node_rc = {
-                let mut current_nodes = current
-                    .as_ref()
-                    .and_then(|rc| rc.children_mut())
-                    .ok_or("The pointer to current directory is missing!")?;
+            let mut current_nodes = current
+                .as_ref()
+                .and_then(|rc| rc.children_mut())
+                .ok_or("The pointer to current directory is missing!")?;
 
-                let node_exists = current_nodes.binary_search_by(|node| node.name().cmp(directory));
+            let node_exists = current_nodes.binary_search_by(|node| node.name().cmp(directory));
 
-                match node_exists {
-                    Ok(index) => Rc::clone(&current_nodes[index]),
-                    Err(position) => {
-                        let node =
-                            Node::new(directory.to_string(), current.as_ref(), NodeKind::new_dir());
+            match node_exists {
+                Ok(index) => current_nodes.get(index).map(Rc::clone),
+                Err(position) => {
+                    let node =
+                        Node::new(directory.to_string(), current.as_ref(), NodeKind::new_dir());
 
-                        let node_rc = Rc::new(node);
-                        current_nodes.insert(position, Rc::clone(&node_rc));
-                        node_rc
-                    }
+                    let node_rc = Rc::new(node);
+                    current_nodes.insert(position, Rc::clone(&node_rc));
+                    Some(node_rc)
                 }
-            };
-
-            Some(node_rc)
+            }
         }
     };
 
