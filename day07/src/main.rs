@@ -19,7 +19,7 @@ fn main() -> Result<()> {
         result
     );
 
-    // Part one
+    // Part two
     let result = part_two(&tree)?;
     println!("[Part two] Smallest deletable dir: {}", result);
 
