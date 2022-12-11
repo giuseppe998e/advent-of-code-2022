@@ -13,11 +13,8 @@ pub struct Node {
 
 impl Node {
     pub fn new(name: String, parent: Option<&Rc<Node>>, kind: NodeKind) -> Self {
-        Self {
-            name,
-            parent: parent.map(Rc::downgrade).unwrap_or_default(),
-            kind,
-        }
+        let parent = parent.map(Rc::downgrade).unwrap_or_default();
+        Self { name, parent, kind }
     }
 
     pub fn name(&self) -> &str {
