@@ -2,8 +2,12 @@ mod motion;
 mod prelude;
 use prelude::*;
 
-fn parse_motions(input: &str) -> Result<Vec<Motion>> {
-    input.lines().map(Motion::try_from).collect()
+fn parse_motions(input: &str) -> Result<Box<[Motion]>> {
+    input
+        .lines()
+        .map(Motion::try_from)
+        .collect::<Result<_>>()
+        .map(Vec::into_boxed_slice)
 }
 
 fn main() -> Result<()> {
