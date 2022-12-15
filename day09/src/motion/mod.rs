@@ -20,7 +20,7 @@ impl TryFrom<&str> for Motion {
     type Error = &'static str;
 
     fn try_from(value: &str) -> std::result::Result<Self, Self::Error> {
-        let mut parts = value.split(' ');
+        let mut parts = value.split_whitespace();
 
         let direction = parts.next().ok_or("The input line is malformed!")?;
         let steps = parts
