@@ -1,6 +1,10 @@
-mod motion;
+mod structs;
+
 mod prelude;
 use prelude::*;
+
+mod parts;
+use parts::part_one;
 
 fn parse_motions(input: &str) -> Result<Box<[Motion]>> {
     input
@@ -16,10 +20,12 @@ fn main() -> Result<()> {
     let motions = parse_motions(input)?;
 
     // Part one
-    // TODO
+    let result = part_one(&motions);
+    println!("[Part one] Positions visited at least once: {}", result);
 
     // Part two
     // TODO
 
     Ok(())
 }
+

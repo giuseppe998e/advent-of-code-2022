@@ -27,3 +27,4 @@ impl TryFrom<&str> for Direction {
         Self::new(value)
     }
 }
+

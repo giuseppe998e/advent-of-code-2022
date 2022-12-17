@@ -1,3 +1,7 @@
-pub use crate::motion::{Direction, Motion};
+pub use crate::structs::{
+    motion::{Direction, Motion},
+    Coords,
+};
 
 pub type Result<T> = std::result::Result<T, &'static str>;
+
